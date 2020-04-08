@@ -1,17 +1,17 @@
-import { ScreenCore } from "./screen.core";
-import { StateCore } from "./state.core";
-import { InputCore } from "./imput.core";
+import { Screen } from "./screen";
+import { State } from "./state";
+import { Input } from "./imput";
 
 export class Main {
 
-    public state: StateCore;
-    public screen: ScreenCore;
-    public input: InputCore;
+    public state: State;
+    public screen: Screen;
+    public input: Input;
 
     constructor() {
-        this.state = new StateCore(this);
-        this.screen = new ScreenCore(this);
-        this.input = new InputCore(this);
+        this.state = new State(this);
+        this.screen = new Screen(this);
+        this.input = new Input(this);
     }
 
 }

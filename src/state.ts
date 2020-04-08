@@ -6,7 +6,7 @@ import { IBlock } from "./interfaces/block.interface";
 import { Player } from "./models/player.model";
 import { Block } from "./models/block.model";
 
-export class StateCore {
+export class State {
 
     private _currentPlayer: number;
     private _players: Array<IPlayer>;

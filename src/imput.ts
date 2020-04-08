@@ -3,7 +3,7 @@ import { Main } from "./main";
 import { IPlayer } from "./interfaces/player.interface";
 import { IBlock } from "./interfaces/block.interface";
 
-export class InputCore {
+export class Input {
 
     private _moveFunctions: object;
 

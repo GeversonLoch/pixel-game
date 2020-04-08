@@ -3,7 +3,7 @@ import { Main } from "./main";
 import { IPlayer } from "./interfaces/player.interface";
 import { IBlock } from "./interfaces/block.interface";
 
-export class ScreenCore {
+export class Screen {
 
     private _screen: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
