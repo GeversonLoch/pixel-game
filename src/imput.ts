@@ -1,7 +1,7 @@
 import { Main } from "./main";
 
 import { IPlayer } from "./interfaces/player.interface";
-import { IBlock } from "./interfaces/block.interface";
+import { IEntity } from "./interfaces/entity.interface";
 
 export class Input {
 
@@ -16,18 +16,22 @@ export class Input {
 
         this._moveFunctions = Object({
             ArrowUp(player: IPlayer) {
+                player.sy = 0;
                 if ((player.y - 1) >= 0) player.y -= 1;
             },
 
             ArrowDown(player: IPlayer) {
+                player.sy = 48;
                 if ((player.y + 1) < dimensions.height) player.y += 1;
             },
 
             ArrowRight(player: IPlayer) {
+                player.sy = 24;
                 if ((player.x + 1) < dimensions.width) player.x += 1;
             },
 
             ArrowLeft(player: IPlayer) {
+                player.sy = 72;
                 if ((player.x - 1) >= 0) player.x -= 1;
             }
         });
@@ -44,20 +48,34 @@ export class Input {
 
     checkCollision() {
         let collisionDirection: string;
+        const player = this.main.state.getPlayer();
 
-        this.main.state.getFruits().forEach((fruit: IBlock) => {
-            if (this.main.state.getPlayer().x === fruit.x - 1 && this.main.state.getPlayer().y === fruit.y) {
-                collisionDirection = 'ArrowRight';
-            }
-            if (this.main.state.getPlayer().x === fruit.x + 1 && this.main.state.getPlayer().y === fruit.y) {
-                collisionDirection = 'ArrowLeft';
-            }
-            if (this.main.state.getPlayer().y === fruit.y - 1 && this.main.state.getPlayer().x === fruit.x) {
-                collisionDirection = 'ArrowDown';
-            }
-            if (this.main.state.getPlayer().y === fruit.y + 1 && this.main.state.getPlayer().x === fruit.x) {
-                collisionDirection = 'ArrowUp';
-            }
+        this.main.state.getBlock().forEach((block: IEntity) => {
+
+            if (
+                (player.x + player.w) === block.dx
+                && (player.y + player.h) >= block.dy
+                && (block.dy + block.dh) > player.y
+            ) collisionDirection = 'ArrowRight';
+
+            if (
+                (block.dx + block.dw) === player.x
+                && (player.y + player.w) >= block.dy
+                && (block.dy + block.dh) > player.y
+            ) collisionDirection = 'ArrowLeft';
+
+            if (
+                (player.y + player.h) === block.dy
+                && (player.x + player.w) >= block.dx
+                && (block.dx + block.dw) > player.x
+            ) collisionDirection = 'ArrowDown';
+
+            if (
+                (block.dy + block.dh) === player.y
+                && (player.x + player.w) >= block.dx
+                && (block.dx + block.dw) > player.x
+            ) collisionDirection = 'ArrowUp';
+
         });
 
         return collisionDirection;
