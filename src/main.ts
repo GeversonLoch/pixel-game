@@ -1,6 +1,6 @@
 import { Screen } from "./screen";
 import { State } from "./state";
-import { Input } from "./imput";
+import { Input } from "./input";
 
 export class Main {
 
