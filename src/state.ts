@@ -1,5 +1,7 @@
 import { Main } from "./main";
 
+import { MapManager } from "./managers/map.manager";
+
 import { IPlayer } from "./interfaces/player.interface";
 import { IEntity } from "./interfaces/entity.interface";
 
@@ -10,34 +12,17 @@ export class State {
 
     private _currentPlayer: number;
     private _players: Array<IPlayer>;
-    private _blocks: Array<IEntity>;
-    private _background: Array<IEntity>;
     
-    public readonly WORLD_WIDTH = 2000;
-    public readonly WORLD_HEIGHT = 2000;
+    public mapManager: MapManager;
 
     constructor(
         private main: Main
     ) {
+        this.mapManager = new MapManager(this.main);
+
         this._players = new Array<IPlayer>(
-            new Player(this.WORLD_WIDTH / 2, this.WORLD_HEIGHT / 2, 24, 24, [0, 24, 48], 0, 24, 0)
+            new Player(this.mapManager.currentRoom.width / 2, this.mapManager.currentRoom.height / 2, 24, 24, [0, 24, 48], 0, 24, 0)
         );
-
-        this._blocks = new Array<IEntity>();
-
-        this._background = new Array<IEntity>();
-        for (let x = 0; x < this.WORLD_WIDTH; x += 16) {
-            for (let y = 0; y < this.WORLD_HEIGHT; y += 16) {
-                this._background.push(new Entity(1, [0, 16, 32][Math.floor(Math.random() * 3)], 160, 16, 16, x, y, 16, 16))
-            }
-        }
-
-        for (let x = 0; x < this.WORLD_WIDTH; x += 16) {
-            for (let y = 0; y < this.WORLD_HEIGHT; y += 16) {
-                if (Math.floor(Math.random() * 30) === 0)
-                    this._background.push(new Entity(1, [48, 56][Math.floor(Math.random() * 2)], [160, 168][Math.floor(Math.random() * 2)], 8, 8, x, y, 8, 8))
-            }
-        }
 
         this.setCurrentPlayer(0);
     }
@@ -57,16 +42,19 @@ export class State {
     }
 
     public getBlock() {
-        return this._blocks;
+        return this.mapManager.currentRoom.blocks;
     }
 
     public getBackground() {
-        return this._background;
+        return this.mapManager.currentRoom.background;
     }
 
     public update(dt: number) {
+        if (this.mapManager.isTransitioning) return;
+
         const player = this.getPlayer();
         const keys = this.main.input.activeKeys;
+        const room = this.mapManager.currentRoom;
 
         let dx = 0;
         let dy = 0;
@@ -99,12 +87,12 @@ export class State {
             // Boundaries check
             if (nextX < 0) nextX = 0;
             if (nextY < 0) nextY = 0;
-            if (nextX + player.w > this.WORLD_WIDTH) nextX = this.WORLD_WIDTH - player.w;
-            if (nextY + player.h > this.WORLD_HEIGHT) nextY = this.WORLD_HEIGHT - player.h;
+            if (nextX + player.w > room.width) nextX = room.width - player.w;
+            if (nextY + player.h > room.height) nextY = room.height - player.h;
 
             // Collision check
             let collision = false;
-            for (const block of this._blocks) {
+            for (const block of room.blocks) {
                 if (
                     nextX < block.dx + block.dw &&
                     nextX + player.w > block.dx &&
@@ -119,6 +107,19 @@ export class State {
             if (!collision) {
                 player.x = nextX;
                 player.y = nextY;
+                
+                // Portal check
+                for (const portal of room.portals) {
+                    if (
+                        player.x < portal.dx + portal.dw &&
+                        player.x + player.w > portal.dx &&
+                        player.y < portal.dy + portal.dh &&
+                        player.y + player.h > portal.dy
+                    ) {
+                        this.mapManager.triggerTransition(portal, player.x, player.y);
+                        break;
+                    }
+                }
             }
 
             // Animate sprite when moving

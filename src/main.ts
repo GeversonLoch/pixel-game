@@ -29,6 +29,7 @@ export class Main {
         
         this.lastTime = timestamp;
 
+        this.screen.update(dt);
         this.state.update(dt);
         this.screen.renderScreen();
         requestAnimationFrame((ts) => this.loop(ts));
