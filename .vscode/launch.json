@@ -2,12 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
-      "name": "npm start (webpack-dev-server)",
+      "name": "Run NPM Start",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start"],
       "console": "integratedTerminal"
-    }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Lançar no Chrome (Build + Start)",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "npm: start"
+    },
   ]
 }

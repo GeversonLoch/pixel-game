@@ -19,7 +19,18 @@
       "label": "npm: start",
       "type": "npm",
       "script": "start",
-      "problemMatcher": []
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Project is running",
+          "endsPattern": "Compiled successfully"
+        }
+      }
     }
   ]
 }

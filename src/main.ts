@@ -14,13 +14,24 @@ export class Main {
         this.input = new Input(this);
         
         // Start the game loop
-        requestAnimationFrame(() => this.loop());
+        requestAnimationFrame((ts) => this.loop(ts));
     }
 
-    private loop() {
-        this.state.update();
+    private lastTime: number = 0;
+
+    private loop(timestamp: number) {
+        if (!this.lastTime) this.lastTime = timestamp;
+        
+        let dt = (timestamp - this.lastTime) / 1000;
+        
+        // Prevent giant spikes when changing tabs
+        if (dt > 0.1) dt = 0.1;
+        
+        this.lastTime = timestamp;
+
+        this.state.update(dt);
         this.screen.renderScreen();
-        requestAnimationFrame(() => this.loop());
+        requestAnimationFrame((ts) => this.loop(ts));
     }
 }
 
