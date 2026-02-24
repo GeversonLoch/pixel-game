@@ -50,26 +50,21 @@ export class Screen {
         this._ctx.clearRect(0, 0, this._screen.width, this._screen.height);
 
         this.main.state.getBackground().forEach((x: IEntity) => {
-            this._ctx.drawImage(this._sprites[x.sprite], x.sx, x.sy, x.sw, x.sh, x.dx, x.dy, x.dw, x.dh);
+            if (this._sprites[x.sprite]) {
+                this._ctx.drawImage(this._sprites[x.sprite], x.sx, x.sy, x.sw, x.sh, x.dx, x.dy, x.dw, x.dh);
+            }
         });
 
         this.main.state.getBlock().forEach((x: IEntity) => {
-            this._ctx.drawImage(this._sprites[x.sprite], x.sx, x.sy, x.sw, x.sh, x.dx, x.dy, x.dw, x.dh);
+            if (this._sprites[x.sprite]) {
+                this._ctx.drawImage(this._sprites[x.sprite], x.sx, x.sy, x.sw, x.sh, x.dx, x.dy, x.dw, x.dh);
+            }
         });
 
         const p = this.main.state.getPlayer();
-        if (p.sRenderDelay < 3) {
-            p.sRenderDelay += 1;
-        } else {
-            p.sRenderDelay = 0;
-
-            if (p.sxIndex < (p.sx.length - 1)) {
-                p.sxIndex += 1;
-            } else p.sxIndex = 0;
+        if (this._sprites[0]) {
+            this._ctx.drawImage(this._sprites[0], p.sx[p.sxIndex], p.sy, p.w, p.h, p.x, p.y, p.w, p.h);
         }
-        this._ctx.drawImage(this._sprites[0], p.sx[p.sxIndex], p.sy, p.w, p.h, p.x, p.y, p.w, p.h);
-
-        // requestAnimationFrame(() => this.renderScreen);
     }
 
 }
