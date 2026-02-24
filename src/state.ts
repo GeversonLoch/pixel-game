@@ -12,40 +12,28 @@ export class State {
     private _players: Array<IPlayer>;
     private _blocks: Array<IEntity>;
     private _background: Array<IEntity>;
+    
+    public readonly WORLD_WIDTH = 2000;
+    public readonly WORLD_HEIGHT = 2000;
 
     constructor(
         private main: Main
     ) {
         this._players = new Array<IPlayer>(
-            new Player(0, 24, 24, 24, [0, 24, 48], 0, 24, 0)
+            new Player(this.WORLD_WIDTH / 2, this.WORLD_HEIGHT / 2, 24, 24, [0, 24, 48], 0, 24, 0)
         );
 
-        this._blocks = new Array<IEntity>(
-            new Entity(1, 0, 16, 32, 80, 100, 100, 32, 80)
-        );
-        for (let x = 0; x < 384; x += 16) {
-            for (let y = 0; y < 384; y += 16) {
-                if (Math.floor(Math.random() * 100) === 0)
-                    this._blocks.push(new Entity(1, 48, [128, 144, 180][Math.floor(Math.random() * 3)], 16, 16, x, y, 16, 16))
-            }
-        }
-
-        for (let x = 0; x < 384; x += 16) {
-            for (let y = 0; y < 384; y += 16) {
-                if (Math.floor(Math.random() * 100) === 0)
-                    this._blocks.push(new Entity(1, 16, 176, 16, 16, x, y, 16, 16))
-            }
-        }
+        this._blocks = new Array<IEntity>();
 
         this._background = new Array<IEntity>();
-        for (let x = 0; x < 384; x += 16) {
-            for (let y = 0; y < 384; y += 16) {
+        for (let x = 0; x < this.WORLD_WIDTH; x += 16) {
+            for (let y = 0; y < this.WORLD_HEIGHT; y += 16) {
                 this._background.push(new Entity(1, [0, 16, 32][Math.floor(Math.random() * 3)], 160, 16, 16, x, y, 16, 16))
             }
         }
 
-        for (let x = 0; x < 384; x += 16) {
-            for (let y = 0; y < 384; y += 16) {
+        for (let x = 0; x < this.WORLD_WIDTH; x += 16) {
+            for (let y = 0; y < this.WORLD_HEIGHT; y += 16) {
                 if (Math.floor(Math.random() * 30) === 0)
                     this._background.push(new Entity(1, [48, 56][Math.floor(Math.random() * 2)], [160, 168][Math.floor(Math.random() * 2)], 8, 8, x, y, 8, 8))
             }
@@ -76,29 +64,30 @@ export class State {
         return this._background;
     }
 
-    public update() {
+    public update(dt: number) {
         const player = this.getPlayer();
         const keys = this.main.input.activeKeys;
-        const dimensions = this.main.screen.getScreenDimensions();
 
         let dx = 0;
         let dy = 0;
+        
+        const speed = 100 * dt; // 100 pixels per second
 
         // Determine intended movement
         if (keys['ArrowUp']) {
-            dy -= 1;
+            dy -= speed;
             player.sy = 0; // Sprite row for up
         }
         else if (keys['ArrowDown']) {
-            dy += 1;
+            dy += speed;
             player.sy = 48; // Sprite row for down
         }
         else if (keys['ArrowLeft']) {
-            dx -= 1;
+            dx -= speed;
             player.sy = 72; // Sprite row for left
         }
         else if (keys['ArrowRight']) {
-            dx += 1;
+            dx += speed;
             player.sy = 24; // Sprite row for right
         }
 
@@ -110,8 +99,8 @@ export class State {
             // Boundaries check
             if (nextX < 0) nextX = 0;
             if (nextY < 0) nextY = 0;
-            if (nextX + player.w > dimensions.width) nextX = dimensions.width - player.w;
-            if (nextY + player.h > dimensions.height) nextY = dimensions.height - player.h;
+            if (nextX + player.w > this.WORLD_WIDTH) nextX = this.WORLD_WIDTH - player.w;
+            if (nextY + player.h > this.WORLD_HEIGHT) nextY = this.WORLD_HEIGHT - player.h;
 
             // Collision check
             let collision = false;
@@ -133,9 +122,8 @@ export class State {
             }
 
             // Animate sprite when moving
-            if (player.sRenderDelay < 3) {
-                player.sRenderDelay += 1;
-            } else {
+            player.sRenderDelay += dt;
+            if (player.sRenderDelay >= 0.05) {
                 player.sRenderDelay = 0;
                 if (player.sxIndex < (player.sx.length - 1)) {
                     player.sxIndex += 1;
