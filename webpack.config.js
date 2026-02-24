@@ -27,7 +27,8 @@ module.exports = {
     plugins: [
         new CopyPlugin([
             { from: 'src/index.html', to: 'index.html' },
-            { from: 'src/*.css', flatten: true }
+            { from: 'src/*.css', flatten: true },
+            { from: 'src/assets/images', to: 'assets/images' }
         ])
     ]
 };
